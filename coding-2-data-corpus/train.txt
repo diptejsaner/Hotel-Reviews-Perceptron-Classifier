@@ -1,0 +1,5 @@
+1 True Pos a b c d
+2 True Neg a a
+3 Fake Pos b c b
+4 Fake Neg d a d d
+5 Fake Neg b b c d a a
