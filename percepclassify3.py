@@ -4,8 +4,10 @@ import json
 
 with open(sys.argv[1], 'r', encoding='utf8') as modelFile:
     data = modelFile.readlines()
-    weights = json.loads(data[0])
-    b = json.loads(data[1])
+    weightsTF = json.loads(data[0])
+    bTF = json.loads(data[1])
+    weightsPN = json.loads(data[2])
+    bPN = json.loads(data[3])
 
 outputFile = open("percepoutput.txt", "w", encoding='utf8')
 
@@ -19,12 +21,12 @@ def tokenize(s):
 inputFile = open(sys.argv[2], "r", encoding='utf8')
 input = {}
 id = ""
-line_token_count = 0
 
 # parse test data to input vectors
 for line in inputFile:
     line = tokenize(line)
     tokens = line.split(" ")
+    line_token_count = 0
 
     for token in tokens:
         if line_token_count == 0:
@@ -40,14 +42,30 @@ for line in inputFile:
         line_token_count += 1
 
 # classify inputs
-output = {}
 for id in input:
-    a = 0
+    aTF = 0
+    aPN = 0
+
     for f in input[id]:
-        if f in weights:
-            a += weights[f] * input[id][f]
-    a += b
-    if a >= 0:
-        output[id] = ["True"]
+        if f in weightsTF:
+            aTF += weightsTF[f] * input[id][f]
+        if f in weightsPN:
+            aPN += weightsPN[f] * input[id][f]
+
+    aTF += bTF
+    aPN += bPN
+
+    outputFile.write(id)
+    if aTF >= 0:
+        outputFile.write(" True")
     else:
-        output[id] = ["Fake"]
+        outputFile.write(" Fake")
+
+    if aPN >= 0:
+        outputFile.write(" Pos")
+    else:
+        outputFile.write(" Neg")
+
+    outputFile.write("\n")
+
+outputFile.close()
